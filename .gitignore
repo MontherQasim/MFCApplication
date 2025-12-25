@@ -1,0 +1,56 @@
+# ---- Build output ----
+[Bb]in/
+[Bb]uild/
+Debug/
+Release/
+x64/
+x86/
+[Oo]bj/
+
+# ---- Visual Studio ----
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# ---- Intermediate / cache ----
+*.obj
+*.pch
+*.idb
+*.ilk
+*.pdb
+*.ipch
+*.tlog
+*.lastbuildstate
+*.cache
+*.VC.db
+*.VC.opendb
+*.opendb
+*.aps
+
+# ---- Binaries ----
+*.exe
+*.dll
+*.lib
+*.app
+*.out
+*.so
+*.dylib
+
+# ---- Logs ----
+*.log
+
+# ---- IDE / Tools ----
+.vscode/
+
+# ---- Profiling / dumps ----
+*.pgc
+*.pgd
+*.dmp
+
+# ---- Legacy VC++ / MFC ----
+*.clw
+*.ncb
+*.opt
+*.plg
