@@ -28,6 +28,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CMDIFrameWndEx)
 	ON_COMMAND_RANGE(ID_VIEW_APPLOOK_WIN_2000, ID_VIEW_APPLOOK_WINDOWS_7, &CMainFrame::OnApplicationLook)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_VIEW_APPLOOK_WIN_2000, ID_VIEW_APPLOOK_WINDOWS_7, &CMainFrame::OnUpdateApplicationLook)
 	ON_WM_SETTINGCHANGE()
+	ON_COMMAND (ID_TEST_WORKERTHREAD, &CMainFrame::OnTestFactorial)
+	ON_MESSAGE (WM_FACTORIAL_COMPLETE, &CMainFrame::OnFactorialComplete)
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -427,4 +429,27 @@ void CMainFrame::OnSettingChange(UINT uFlags, LPCTSTR lpszSection)
 {
 	CMDIFrameWndEx::OnSettingChange(uFlags, lpszSection);
 	m_wndOutput.UpdateFonts();
+}
+
+void CMainFrame::OnTestFactorial ()
+{
+	int n = 10;
+	FactorialThreadData* pData = new FactorialThreadData;
+	pData->nInput = n;
+	pData->pNotifyWnd = this;
+	AfxBeginThread (FactorialWorkerThread, pData);
+
+	/*
+	  To create the thread in a suspended state:
+	  AfxBeginThread (FactorialWorkerThread, pData, THREAD_PRIORITY_NORMAL, 0, CREATE_SUSPENDED, NULL);
+	*/
+}
+
+LRESULT CMainFrame::OnFactorialComplete (WPARAM wParam, LPARAM lParam)
+{
+	unsigned long long result = (unsigned long long)wParam;
+	CString msg;
+	msg.Format (_T ("Factorial result = %llu"), result);
+	AfxMessageBox (msg);
+	return 0;
 }
