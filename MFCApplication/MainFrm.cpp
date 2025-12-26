@@ -7,6 +7,7 @@
 #include "MFCApplication.h"
 
 #include "MainFrm.h"
+#include "UIThread.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -30,6 +31,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CMDIFrameWndEx)
 	ON_WM_SETTINGCHANGE()
 	ON_COMMAND (ID_TEST_WORKERTHREAD, &CMainFrame::OnTestFactorial)
 	ON_MESSAGE (WM_FACTORIAL_COMPLETE, &CMainFrame::OnFactorialComplete)
+	ON_COMMAND (ID_TEST_UITHREAD, &CMainFrame::OnUIThreadWindow)
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -452,4 +454,9 @@ LRESULT CMainFrame::OnFactorialComplete (WPARAM wParam, LPARAM lParam)
 	msg.Format (_T ("Factorial result = %llu"), result);
 	AfxMessageBox (msg);
 	return 0;
+}
+
+void CMainFrame::OnUIThreadWindow ()
+{
+	CWinThread* pThread = AfxBeginThread (RUNTIME_CLASS (UIThread));
 }

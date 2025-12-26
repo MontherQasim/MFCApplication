@@ -85,6 +85,7 @@
 #define IDS_EXPLORER				305
 #define IDS_EDIT_MENU				306
 #define ID_TEST_WORKERTHREAD	    307
+#define ID_TEST_UITHREAD            308
 
 // Next default values for new objects
 //

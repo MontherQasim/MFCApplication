@@ -53,6 +53,7 @@ protected:
 	afx_msg void OnApplicationLook(UINT id);
 	afx_msg void OnUpdateApplicationLook(CCmdUI* pCmdUI);
 	afx_msg void OnSettingChange(UINT uFlags, LPCTSTR lpszSection);
+	afx_msg void OnUIThreadWindow ();
 	afx_msg void OnTestFactorial ();
 	afx_msg LRESULT OnFactorialComplete (WPARAM wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()

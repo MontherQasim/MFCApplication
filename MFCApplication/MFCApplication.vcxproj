@@ -185,6 +185,8 @@
   <ItemGroup>
     <ClInclude Include="ChildFrm.h" />
     <ClInclude Include="ClassView.h" />
+    <ClInclude Include="ThreadWindow.h" />
+    <ClInclude Include="UIThread.h" />
     <ClInclude Include="WorkerThread.h" />
     <ClInclude Include="FileView.h" />
     <ClInclude Include="framework.h" />
@@ -202,6 +204,8 @@
   <ItemGroup>
     <ClCompile Include="ChildFrm.cpp" />
     <ClCompile Include="ClassView.cpp" />
+    <ClCompile Include="ThreadWindow.cpp" />
+    <ClCompile Include="UIThread.cpp" />
     <ClCompile Include="WorkerThread.cpp" />
     <ClCompile Include="FileView.cpp" />
     <ClCompile Include="MainFrm.cpp" />
