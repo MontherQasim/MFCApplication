@@ -21,6 +21,8 @@ UINT FactorialWorkerThread (LPVOID pParam)
 
     if (pData->pNotifyWnd && ::IsWindow (pData->pNotifyWnd->m_hWnd))
     {
+        // ::Sleep (0) Allow other threads to run
+        ::Sleep (5000);
         pData->pNotifyWnd->PostMessage (WM_FACTORIAL_COMPLETE, (WPARAM)result, 0);
     }
 
