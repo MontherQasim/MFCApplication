@@ -443,13 +443,17 @@ void CMainFrame::OnTestFactorial ()
 	FactorialThreadData* pData = new FactorialThreadData;
 	pData->nInput = n;
 	pData->pNotifyWnd = this;
-	m_pWorkerThread = AfxBeginThread (FactorialWorkerThread, pData);
-
+	// Create the worker thread in a suspended state to prevent automatic deletion of the thread object before disableing auto-deletion
+	m_pWorkerThread = AfxBeginThread (FactorialWorkerThread, pData, THREAD_PRIORITY_NORMAL, 0, CREATE_SUSPENDED, NULL);
+	m_pWorkerThread->m_bAutoDelete = FALSE;
 	/*
-	  To create the thread in a suspended state: suspend count = 0
-	  AfxBeginThread (FactorialWorkerThread, pData, THREAD_PRIORITY_NORMAL, 0, CREATE_SUSPENDED, NULL);
+	* OR use DuplicateHandle to create a duplicate thread handle with same access rights and use it in GetExitCodeThread later
+	HANDLE hThread;
+	::DuplicateHandle(GetCurrentProcess(), m_pWorkerThread->m_hThread,
+	GetCurrentProcess(), &hThread, 0, FALSE,
+	DUPLICATE_SAME_ACCESS);
 	*/
-
+	m_pWorkerThread->ResumeThread ();
 	Sleep (3000);
 	DWORD dwExitCode = 0;
 	if (::GetExitCodeThread (m_pWorkerThread->m_hThread, &dwExitCode))
@@ -461,10 +465,23 @@ void CMainFrame::OnTestFactorial ()
 			CString msg;
 			msg.Format (_T ("Thread finished. Exit Code = %lu"), dwExitCode);
 			AfxMessageBox (msg);
+			delete m_pWorkerThread;
 		}
 	}
 	else
-	{  
+	{
+		/*
+		 Alternatively, create the worker thread with auto-deletion enabled (default behavior).
+		 In this case, the thread starts immediately because the suspend count is zero.
+		 AfxBeginThread(FactorialWorkerThread, pData);
+		 m_pWorkerThread->m_bAutoDelete = TRUE;   // default behavior
+
+		 Note:
+		 SuspendThread() and ResumeThread() return the previous suspend count value.
+		 As a result, the number of ResumeThread() calls must match the number of
+		 SuspendThread() calls for the thread to actually begin execution.
+		*/
+
 		AfxMessageBox (_T ("GetExitCodeThread failed (invalid handle or thread object was auto-deleted)."));
 	}
 
@@ -510,5 +527,5 @@ void CMainFrame::OnUpdateThreadResume (CCmdUI* pCmdUI)
 
 void CMainFrame::OnUIThreadWindow ()
 {
-	CWinThread* pThread = AfxBeginThread (RUNTIME_CLASS (UIThread));     
+	CWinThread* pThread = AfxBeginThread (RUNTIME_CLASS (UIThread));
 }
