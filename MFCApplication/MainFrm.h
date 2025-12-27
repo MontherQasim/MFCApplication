@@ -40,9 +40,11 @@ protected:  // control bar embedded members
 	CMFCStatusBar     m_wndStatusBar;
 	CMFCToolBarImages m_UserImages;
 	CFileView         m_wndFileView;
-	CClassView        m_wndClassView;
+	CClassView        m_wndClassView;							
 	COutputWnd        m_wndOutput;
 	CPropertiesWnd    m_wndProperties;
+	CWinThread*       m_pWorkerThread;
+	bool m_bSuspended = false;
 
 // Generated message map functions
 protected:
@@ -56,6 +58,10 @@ protected:
 	afx_msg void OnUIThreadWindow ();
 	afx_msg void OnTestFactorial ();
 	afx_msg LRESULT OnFactorialComplete (WPARAM wParam, LPARAM lParam);
+	afx_msg void OnSustpendedWorkerThread ();
+	afx_msg void OnResumedWorkerThread ();
+	afx_msg void OnUpdateThreadSuspend (CCmdUI* pCmdUI);
+	afx_msg void OnUpdateThreadResume (CCmdUI* pCmdUI);
 	DECLARE_MESSAGE_MAP()
 
 	BOOL CreateDockingWindows();

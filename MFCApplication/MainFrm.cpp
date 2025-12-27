@@ -1,4 +1,4 @@
-
+﻿
 // MainFrm.cpp : implementation of the CMainFrame class
 //
 
@@ -32,6 +32,10 @@ BEGIN_MESSAGE_MAP(CMainFrame, CMDIFrameWndEx)
 	ON_COMMAND (ID_TEST_WORKERTHREAD, &CMainFrame::OnTestFactorial)
 	ON_MESSAGE (WM_FACTORIAL_COMPLETE, &CMainFrame::OnFactorialComplete)
 	ON_COMMAND (ID_TEST_UITHREAD, &CMainFrame::OnUIThreadWindow)
+	ON_COMMAND (ID_THREAD_SUSPENDTHREAD, &CMainFrame::OnSustpendedWorkerThread)
+	ON_COMMAND (ID_THREAD_RESUMETHREAD, &CMainFrame::OnResumedWorkerThread)
+	ON_UPDATE_COMMAND_UI (ID_THREAD_SUSPENDTHREAD, &CMainFrame::OnUpdateThreadSuspend)
+	ON_UPDATE_COMMAND_UI (ID_THREAD_RESUMETHREAD, &CMainFrame::OnUpdateThreadResume)
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -439,10 +443,10 @@ void CMainFrame::OnTestFactorial ()
 	FactorialThreadData* pData = new FactorialThreadData;
 	pData->nInput = n;
 	pData->pNotifyWnd = this;
-	AfxBeginThread (FactorialWorkerThread, pData);
+	m_pWorkerThread = AfxBeginThread (FactorialWorkerThread, pData);
 
 	/*
-	  To create the thread in a suspended state:
+	  To create the thread in a suspended state: suspend count = 0
 	  AfxBeginThread (FactorialWorkerThread, pData, THREAD_PRIORITY_NORMAL, 0, CREATE_SUSPENDED, NULL);
 	*/
 }
@@ -454,6 +458,35 @@ LRESULT CMainFrame::OnFactorialComplete (WPARAM wParam, LPARAM lParam)
 	msg.Format (_T ("Factorial result = %llu"), result);
 	AfxMessageBox (msg);
 	return 0;
+}
+
+void CMainFrame::OnSustpendedWorkerThread ()
+{
+	if (m_pWorkerThread != nullptr && !m_bSuspended)
+	{
+		m_pWorkerThread->SuspendThread ();
+		m_bSuspended = true;
+	}
+}
+
+void CMainFrame::OnResumedWorkerThread ()
+{
+	if (m_pWorkerThread != nullptr && m_bSuspended)
+	{
+		m_pWorkerThread->ResumeThread ();
+		m_bSuspended = false;
+	}
+}
+// Update UI handlers for Suspend/Resume thread commands to avoid multiple suspend/resume calls
+
+void CMainFrame::OnUpdateThreadSuspend (CCmdUI* pCmdUI)
+{
+	pCmdUI->Enable (m_pWorkerThread != nullptr && !m_bSuspended);
+}
+
+void CMainFrame::OnUpdateThreadResume (CCmdUI* pCmdUI)
+{
+	pCmdUI->Enable (m_pWorkerThread != nullptr && m_bSuspended);
 }
 
 void CMainFrame::OnUIThreadWindow ()

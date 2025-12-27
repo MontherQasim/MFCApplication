@@ -86,6 +86,8 @@
 #define IDS_EDIT_MENU				306
 #define ID_TEST_WORKERTHREAD	    307
 #define ID_TEST_UITHREAD            308
+#define ID_THREAD_SUSPENDTHREAD     309
+#define ID_THREAD_RESUMETHREAD      310
 
 // Next default values for new objects
 //
