@@ -449,6 +449,25 @@ void CMainFrame::OnTestFactorial ()
 	  To create the thread in a suspended state: suspend count = 0
 	  AfxBeginThread (FactorialWorkerThread, pData, THREAD_PRIORITY_NORMAL, 0, CREATE_SUSPENDED, NULL);
 	*/
+
+	Sleep (3000);
+	DWORD dwExitCode = 0;
+	if (::GetExitCodeThread (m_pWorkerThread->m_hThread, &dwExitCode))
+	{
+		if (dwExitCode == STILL_ACTIVE)
+			AfxMessageBox (_T ("Thread is still running"));
+		else
+		{
+			CString msg;
+			msg.Format (_T ("Thread finished. Exit Code = %lu"), dwExitCode);
+			AfxMessageBox (msg);
+		}
+	}
+	else
+	{  
+		AfxMessageBox (_T ("GetExitCodeThread failed (invalid handle or thread object was auto-deleted)."));
+	}
+
 }
 
 LRESULT CMainFrame::OnFactorialComplete (WPARAM wParam, LPARAM lParam)
@@ -491,5 +510,5 @@ void CMainFrame::OnUpdateThreadResume (CCmdUI* pCmdUI)
 
 void CMainFrame::OnUIThreadWindow ()
 {
-	CWinThread* pThread = AfxBeginThread (RUNTIME_CLASS (UIThread));
+	CWinThread* pThread = AfxBeginThread (RUNTIME_CLASS (UIThread));     
 }

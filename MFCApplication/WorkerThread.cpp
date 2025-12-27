@@ -17,6 +17,13 @@ UINT FactorialWorkerThread (LPVOID pParam)
 {
     FactorialThreadData* pData = (FactorialThreadData*)pParam;
 
+    if (pData->nInput > 40 || pData->nInput < 0)
+    {
+        delete pData;
+        AfxEndThread (0);
+		return 0; // to avoid warning
+    }
+
     unsigned long long result = CalculateFactorial (pData->nInput);
 
     if (pData->pNotifyWnd && ::IsWindow (pData->pNotifyWnd->m_hWnd))
