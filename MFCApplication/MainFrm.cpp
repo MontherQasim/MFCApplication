@@ -469,8 +469,11 @@ void CMainFrame::OnTestFactorial ()
 	DWORD dwExitCode = 0;
 	if (::GetExitCodeThread (m_pWorkerThread->m_hThread, &dwExitCode))
 	{
-		if (dwExitCode == STILL_ACTIVE)
+		if (dwExitCode == STILL_ACTIVE)	 
+		{
 			AfxMessageBox (_T ("Thread is still running"));
+			m_pWorkerThread->SetThreadPriority (THREAD_PRIORITY_ABOVE_NORMAL);
+		}
 		else
 		{
 			CString msg;

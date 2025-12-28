@@ -147,6 +147,11 @@ BOOL CMFCApplicationApp::InitInstance()
 	pMainFrame->ShowWindow(m_nCmdShow);
 	pMainFrame->UpdateWindow();
 
+	::SetPriorityClass (
+		::GetCurrentProcess (),
+		ABOVE_NORMAL_PRIORITY_CLASS
+	);
+
 	return TRUE;
 }
 
