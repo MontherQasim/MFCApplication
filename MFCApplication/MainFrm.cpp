@@ -443,7 +443,27 @@ void CMainFrame::OnSettingChange(UINT uFlags, LPCTSTR lpszSection)
 
 void CMainFrame::OnTestFactorial ()
 {
-	int n = 10;
+/*
+  NOTE ABOUT C RUNTIME IN MULTITHREADED PROGRAMS
+
+  Some standard C runtime functions (like rand, strtok, asctime, etc.)
+  use internal shared state/static data. In a multithreaded program,
+  if more than one thread calls these functions at the same time,
+  their shared internal data can be overwritten, causing race conditions
+  and unpredictable behavior.
+
+  Visual C++ solves this by providing multithreaded versions of the
+  C runtime library (/MT, /MD). These versions maintain per-thread
+  internal data so that calls from different threads do not interfere.
+
+  Configuration Properties
+   → C/C++
+	  → Code Generation
+		 → Runtime Library
+		 → Select one of the Multithreaded options
+  The default MFC Application project settings use the Multithreaded DLL (/MD) option.
+ */
+	int n = rand () % 40; 
 	g_nContinue = new long (1);
 	FactorialThreadData* pData = new FactorialThreadData;
 	pData->nInput = n;
