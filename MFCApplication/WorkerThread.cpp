@@ -1,11 +1,15 @@
 #include "pch.h"
 #include "WorkerThread.h"
 
-unsigned long long CalculateFactorial (int n)
+unsigned long long CalculateFactorial (int n, volatile LONG* pContinue)
 {
+    if (*pContinue == 0)
+    {
+        return -1;
+    }
     if (n <= 1)
         return 1;
-    return n * CalculateFactorial (n - 1);
+    return n * CalculateFactorial(n - 1, pContinue);
 }
 
 /*
@@ -15,21 +19,34 @@ unsigned long long CalculateFactorial (int n)
 
 UINT FactorialWorkerThread (LPVOID pParam)
 {
-    FactorialThreadData* pData = (FactorialThreadData*)pParam;
+    auto* pData = static_cast<FactorialThreadData*>(pParam);
+
+    if (!pData)
+        return 0;
+
+    if (!pData->pContinue || *(pData->pContinue) == 0)
+    {
+        delete pData;
+        return 0;
+    }
 
     if (pData->nInput > 40 || pData->nInput < 0)
     {
         delete pData;
         AfxEndThread (0);
-		return 0; // to avoid warning
     }
 
-    unsigned long long result = CalculateFactorial (pData->nInput);
+    unsigned long long result =
+        CalculateFactorial (pData->nInput, pData->pContinue);
+    Sleep (5000);
 
-    if (pData->pNotifyWnd && ::IsWindow (pData->pNotifyWnd->m_hWnd))
+    if (pData->pContinue &&
+        *pData->pContinue != 0 &&
+        result != (unsigned long long) - 1 &&
+        pData->pNotifyWnd &&
+        ::IsWindow (pData->pNotifyWnd->m_hWnd))
     {
-        // ::Sleep (0) Allow other threads to run
-        ::Sleep (5000);
+     // ::Sleep (0) Allow other threads to run
         pData->pNotifyWnd->PostMessage (WM_FACTORIAL_COMPLETE, (WPARAM)result, 0);
     }
 

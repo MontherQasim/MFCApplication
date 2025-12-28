@@ -8,6 +8,7 @@
 
 #include "MainFrm.h"
 #include "UIThread.h"
+#include "ThreadWindow.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -31,6 +32,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CMDIFrameWndEx)
 	ON_WM_SETTINGCHANGE()
 	ON_COMMAND (ID_TEST_WORKERTHREAD, &CMainFrame::OnTestFactorial)
 	ON_MESSAGE (WM_FACTORIAL_COMPLETE, &CMainFrame::OnFactorialComplete)
+	ON_MESSAGE (WM_STOP_WORKER, &CMainFrame::OnStopWorker)
 	ON_COMMAND (ID_TEST_UITHREAD, &CMainFrame::OnUIThreadWindow)
 	ON_COMMAND (ID_THREAD_SUSPENDTHREAD, &CMainFrame::OnSustpendedWorkerThread)
 	ON_COMMAND (ID_THREAD_RESUMETHREAD, &CMainFrame::OnResumedWorkerThread)
@@ -52,11 +54,13 @@ CMainFrame::CMainFrame() noexcept
 {
 	// TODO: add member initialization code here
 	theApp.m_nAppLook = theApp.GetInt(_T("ApplicationLook"), ID_VIEW_APPLOOK_VS_2008);
+	m_pWorkerThread = nullptr;
 }
 
 CMainFrame::~CMainFrame()
 {
 }
+volatile LONG* CMainFrame::g_nContinue = nullptr;
 
 int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
@@ -440,21 +444,28 @@ void CMainFrame::OnSettingChange(UINT uFlags, LPCTSTR lpszSection)
 void CMainFrame::OnTestFactorial ()
 {
 	int n = 10;
+	g_nContinue = new long (1);
 	FactorialThreadData* pData = new FactorialThreadData;
 	pData->nInput = n;
 	pData->pNotifyWnd = this;
+	pData->pContinue = g_nContinue;
 	// Create the worker thread in a suspended state to prevent automatic deletion of the thread object before disableing auto-deletion
 	m_pWorkerThread = AfxBeginThread (FactorialWorkerThread, pData, THREAD_PRIORITY_NORMAL, 0, CREATE_SUSPENDED, NULL);
 	m_pWorkerThread->m_bAutoDelete = FALSE;
 	/*
-	* OR use DuplicateHandle to create a duplicate thread handle with same access rights and use it in GetExitCodeThread later
+	OR use DuplicateHandle to create a duplicate thread handle with same access rights and use it in GetExitCodeThread later
 	HANDLE hThread;
 	::DuplicateHandle(GetCurrentProcess(), m_pWorkerThread->m_hThread,
 	GetCurrentProcess(), &hThread, 0, FALSE,
 	DUPLICATE_SAME_ACCESS);
 	*/
 	m_pWorkerThread->ResumeThread ();
-	Sleep (3000);
+	/*
+	In case we wish to terminate another thread, we can use WaitForSingleObject to wait for the thread to finish.
+	HANDLE hThread = pThread->m_hThread; 
+    nContinue = 0;                       
+    ::WaitForSingleObject(hThread, INFINITE);
+	*/
 	DWORD dwExitCode = 0;
 	if (::GetExitCodeThread (m_pWorkerThread->m_hThread, &dwExitCode))
 	{
@@ -466,6 +477,7 @@ void CMainFrame::OnTestFactorial ()
 			msg.Format (_T ("Thread finished. Exit Code = %lu"), dwExitCode);
 			AfxMessageBox (msg);
 			delete m_pWorkerThread;
+			delete g_nContinue;
 		}
 	}
 	else
@@ -483,8 +495,18 @@ void CMainFrame::OnTestFactorial ()
 		*/
 
 		AfxMessageBox (_T ("GetExitCodeThread failed (invalid handle or thread object was auto-deleted)."));
+		delete g_nContinue;
+	}
+}
+
+LRESULT CMainFrame::OnStopWorker (WPARAM wParam, LPARAM lParam)
+{
+	if (g_nContinue)
+	{
+		*g_nContinue = 0;
 	}
 
+	return 0;
 }
 
 LRESULT CMainFrame::OnFactorialComplete (WPARAM wParam, LPARAM lParam)
