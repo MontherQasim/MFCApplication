@@ -53,7 +53,7 @@ BOOL CMFCApplicationView::PreCreateWindow(CREATESTRUCT& cs)
 
 // CMFCApplicationView drawing
 
-void CMFCApplicationView::OnDraw(CDC* /*pDC*/)
+void CMFCApplicationView::OnDraw(CDC* pDC)
 {
 	CMFCApplicationDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
@@ -61,6 +61,27 @@ void CMFCApplicationView::OnDraw(CDC* /*pDC*/)
 		return;
 
 	// TODO: add draw code for native data here
+	DrawRectangle (pDC);
+}
+
+void CMFCApplicationView::DrawRectangle (CDC* pDC)
+{
+	COLORREF clr = RGB (255, 0, 255);  
+
+	BYTE r = GetRValue (clr);
+	BYTE g = GetGValue (clr);
+	BYTE b = GetBValue (clr);
+
+	CString text;
+	text.Format (_T ("Color: R=%d  G=%d  B=%d"), r, g, b);
+	pDC->TextOut (10, 10, text);
+
+	CBrush brush (clr);              
+	CBrush* pOldBrush = pDC->SelectObject (&brush);
+
+	pDC->Rectangle (10, 40, 160, 140); 
+
+	pDC->SelectObject (pOldBrush);  
 }
 
 
