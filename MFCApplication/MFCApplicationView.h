@@ -30,6 +30,8 @@ protected:
 	virtual void DrawEllipse (CDC* pDC);
 	virtual void DrawPie (CDC* pDC);
 	virtual void CheckPaletteSupport ();
+	virtual void OnInitialUpdate ();
+	virtual void OnDestroy ();
 // Implementation
 public:
 	virtual ~CMFCApplicationView();
@@ -45,7 +47,11 @@ protected:
 	afx_msg void OnFilePrintPreview();
 	afx_msg void OnRButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnContextMenu(CWnd* pWnd, CPoint point);
+	afx_msg void OnTimer (UINT_PTR nIDEvent);
 	DECLARE_MESSAGE_MAP()
+
+protected:
+	int m_counter = 0;
 };
 
 #ifndef _DEBUG  // debug version in MFCApplicationView.cpp

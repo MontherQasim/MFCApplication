@@ -29,6 +29,8 @@ BEGIN_MESSAGE_MAP(CMFCApplicationView, CView)
 	ON_COMMAND(ID_FILE_PRINT_PREVIEW, &CMFCApplicationView::OnFilePrintPreview)
 	ON_WM_CONTEXTMENU()
 	ON_WM_RBUTTONUP()
+	ON_WM_DESTROY ()
+    ON_WM_TIMER ()
 END_MESSAGE_MAP()
 
 // CMFCApplicationView construction/destruction
@@ -41,7 +43,27 @@ CMFCApplicationView::CMFCApplicationView() noexcept
 
 CMFCApplicationView::~CMFCApplicationView()
 {
+	//KillTimer (1);	  // or inside OnDestroy
 }
+void CMFCApplicationView::OnInitialUpdate ()
+{
+	CView::OnInitialUpdate ();
+
+	SetTimer (1, 1000, NULL);
+}
+/*
+int CMainWindow::OnCreate (LPCREATESTRUCT lpcs)
+{
+	if (CFrameWnd::OnCreate (lpcs) == -1)
+		return -1;
+
+	if (!SetTimer (ID_TIMER_ELLIPSE, 100, NULL)) {
+		MessageBox (_T ("Error: SetTimer failed"));
+		return -1;
+	}
+	return 0;
+}
+*/
 
 BOOL CMFCApplicationView::PreCreateWindow(CREATESTRUCT& cs)
 {
@@ -59,6 +81,11 @@ void CMFCApplicationView::OnDraw(CDC* pDC)
 	ASSERT_VALID(pDoc);
 	if (!pDoc)
 		return;
+
+	CString s;
+	s.Format (_T ("Seconds passed: %d"), m_counter);
+
+	pDC->TextOut (10, 10, s);
 }
 
 void CMFCApplicationView::DrawRectangle (CDC* pDC)
@@ -163,7 +190,23 @@ void CMFCApplicationView::CheckPaletteSupport ()
 		AfxMessageBox (_T ("No hardware palette support. Logical palettes are not needed."));
 }
 
+void CMFCApplicationView::OnTimer (UINT_PTR nIDEvent)
+{
+	if (nIDEvent == 1)
+	{
+		m_counter++;     
+		Invalidate ();
+	}
 
+	CView::OnTimer (nIDEvent);
+}
+
+
+void CMFCApplicationView::OnDestroy ()
+{
+	KillTimer (1);
+	CView::OnDestroy ();
+}
 
 // CMFCApplicationView printing
 
