@@ -63,6 +63,13 @@ void CMFCApplicationView::OnDraw(CDC* pDC)
 
 void CMFCApplicationView::DrawRectangle (CDC* pDC)
 {
+
+	/*
+	Create three pens.
+	CPen pen1 (PS_SOLID, 16, RGB (242, 36, 204));	 // RGB color dont't use palette
+	CPen pen2 (PS_SOLID, 16, PALETTERGB (242, 36, 204)); // RGB color use palette
+	CPen pen3 (PS_SOLID, 16, PALETTEINDEX (3));			 // Palette index
+	*/
 	COLORREF clr = RGB (255, 0, 255);  
 
 	BYTE r = GetRValue (clr);
