@@ -19,6 +19,7 @@
 
 
 // CMFCApplicationView
+CMFCApplicationView* g_pView = nullptr;
 
 IMPLEMENT_DYNCREATE(CMFCApplicationView, CView)
 
@@ -30,7 +31,7 @@ BEGIN_MESSAGE_MAP(CMFCApplicationView, CView)
 	ON_WM_CONTEXTMENU()
 	ON_WM_RBUTTONUP()
 	ON_WM_DESTROY ()
-    ON_WM_TIMER ()
+ //   ON_WM_TIMER ()
 END_MESSAGE_MAP()
 
 // CMFCApplicationView construction/destruction
@@ -38,7 +39,7 @@ END_MESSAGE_MAP()
 CMFCApplicationView::CMFCApplicationView() noexcept
 {
 	// TODO: add construction code here
-
+	m_counter = 0;
 }
 
 CMFCApplicationView::~CMFCApplicationView()
@@ -49,7 +50,9 @@ void CMFCApplicationView::OnInitialUpdate ()
 {
 	CView::OnInitialUpdate ();
 
-	SetTimer (1, 1000, NULL);
+	g_pView = this;
+
+	::SetTimer (GetSafeHwnd (), 1, 1000, CMFCApplicationView::MyTimerProc);
 }
 /*
 int CMainWindow::OnCreate (LPCREATESTRUCT lpcs)
@@ -190,20 +193,36 @@ void CMFCApplicationView::CheckPaletteSupport ()
 		AfxMessageBox (_T ("No hardware palette support. Logical palettes are not needed."));
 }
 
-void CMFCApplicationView::OnTimer (UINT_PTR nIDEvent)
+//void CMFCApplicationView::OnTimer (UINT_PTR nIDEvent)
+//{
+//	if (nIDEvent == 1)
+//	{
+//		m_counter++;     
+//		Invalidate ();
+//	}
+//
+//	CView::OnTimer (nIDEvent);
+//}
+VOID CALLBACK CMFCApplicationView::MyTimerProc (
+	HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 {
-	if (nIDEvent == 1)
-	{
-		m_counter++;     
-		Invalidate ();
-	}
+	UNREFERENCED_PARAMETER (hwnd);
+	UNREFERENCED_PARAMETER (uMsg);
+	UNREFERENCED_PARAMETER (dwTime);
 
-	CView::OnTimer (nIDEvent);
+	if (idEvent != 1)
+		return;
+
+	if (g_pView == nullptr)
+		return;
+
+	g_pView->m_counter++;       
+	g_pView->Invalidate (FALSE);    
 }
-
 
 void CMFCApplicationView::OnDestroy ()
 {
+	// Stopping a Timer
 	KillTimer (1);
 	CView::OnDestroy ();
 }

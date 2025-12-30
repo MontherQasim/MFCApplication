@@ -48,10 +48,13 @@ protected:
 	afx_msg void OnRButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnContextMenu(CWnd* pWnd, CPoint point);
 	afx_msg void OnTimer (UINT_PTR nIDEvent);
+
+	// or it can be a global function
+	static VOID CALLBACK MyTimerProc (HWND hwnd, UINT uMsg,UINT_PTR idEvent, DWORD dwTime);
 	DECLARE_MESSAGE_MAP()
 
 protected:
-	int m_counter = 0;
+	int m_counter;
 };
 
 #ifndef _DEBUG  // debug version in MFCApplicationView.cpp
