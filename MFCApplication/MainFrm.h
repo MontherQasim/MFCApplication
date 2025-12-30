@@ -64,6 +64,8 @@ protected:
 	afx_msg void OnUpdateThreadSuspend (CCmdUI* pCmdUI);
 	afx_msg void OnUpdateThreadResume (CCmdUI* pCmdUI);
 	afx_msg LRESULT OnStopWorker (WPARAM wParam, LPARAM lParam);
+	afx_msg BOOL OnQueryNewPalette ();
+	afx_msg void OnPaletteChanged (CWnd* pFocusWnd);
 	DECLARE_MESSAGE_MAP()
 
 	BOOL CreateDockingWindows();

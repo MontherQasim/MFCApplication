@@ -38,6 +38,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CMDIFrameWndEx)
 	ON_COMMAND (ID_THREAD_RESUMETHREAD, &CMainFrame::OnResumedWorkerThread)
 	ON_UPDATE_COMMAND_UI (ID_THREAD_SUSPENDTHREAD, &CMainFrame::OnUpdateThreadSuspend)
 	ON_UPDATE_COMMAND_UI (ID_THREAD_RESUMETHREAD, &CMainFrame::OnUpdateThreadResume)
+	ON_WM_QUERYNEWPALETTE ()
+	ON_WM_PALETTECHANGED ()
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -440,7 +442,51 @@ void CMainFrame::OnSettingChange(UINT uFlags, LPCTSTR lpszSection)
 	CMDIFrameWndEx::OnSettingChange(uFlags, lpszSection);
 	m_wndOutput.UpdateFonts();
 }
+BOOL CMainFrame::OnQueryNewPalette ()
+{
+	CDocument* pDoc = GetActiveDocument ();
+	if (pDoc != nullptr)
+		pDoc->UpdateAllViews (nullptr);  
 
+	return TRUE;
+}
+
+void CMainFrame::OnPaletteChanged (CWnd* pFocusWnd)
+{
+	if (pFocusWnd == this)
+		return;
+
+	CDocument* pDoc = GetActiveDocument ();
+	if (pDoc != nullptr)
+		pDoc->UpdateAllViews (nullptr);
+}
+/*
+Realize a global palette here only if the app uses one shared CPalette.
+BOOL CMainWindow::OnQueryNewPalette ()
+{
+    CClientDC dc(this);
+    CPalette* pOldPalette = dc.SelectPalette(&m_palette, FALSE);
+
+    UINT nCount;
+    if (nCount = dc.RealizePalette())
+        Invalidate();  
+
+    dc.SelectPalette(pOldPalette, FALSE);
+    return nCount;
+}
+
+void CMainWindow::OnPaletteChanged (CWnd* pFocusWnd)
+{
+	if (pFocusWnd != this) {
+		CClientDC dc(this);
+
+		CPalette* pOldPalette = dc.SelectPalette(&m_palette, FALSE);
+		if (dc.RealizePalette())
+			Invalidate();
+		dc.SelectPalette(pOldPalette, FALSE);
+	}
+}
+*/
 void CMainFrame::OnTestFactorial ()
 {
 /*
