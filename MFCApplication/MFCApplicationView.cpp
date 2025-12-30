@@ -148,6 +148,20 @@ void CMFCApplicationView::DrawPie (CDC* pDC)
 		pDC->SelectPalette (pOld, FALSE);
 }
 
+void CMFCApplicationView::CheckPaletteSupport ()
+{
+	CClientDC dc (this);
+
+	BOOL bUsePalette = FALSE;
+
+	if (dc.GetDeviceCaps (RASTERCAPS) & RC_PALETTE)
+		bUsePalette = TRUE;
+
+	if (bUsePalette)
+		AfxMessageBox (_T ("This device supports a hardware palette (8-bit mode)."));
+	else
+		AfxMessageBox (_T ("No hardware palette support. Logical palettes are not needed."));
+}
 
 
 

@@ -29,6 +29,7 @@ protected:
 	virtual void DrawRectangle (CDC* pDC);
 	virtual void DrawEllipse (CDC* pDC);
 	virtual void DrawPie (CDC* pDC);
+	virtual void CheckPaletteSupport ();
 // Implementation
 public:
 	virtual ~CMFCApplicationView();
