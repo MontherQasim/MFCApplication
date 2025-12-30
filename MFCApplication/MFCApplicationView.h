@@ -27,6 +27,8 @@ protected:
 	virtual void OnBeginPrinting(CDC* pDC, CPrintInfo* pInfo);
 	virtual void OnEndPrinting(CDC* pDC, CPrintInfo* pInfo);
 	virtual void DrawRectangle (CDC* pDC);
+	virtual void DrawEllipse (CDC* pDC);
+	virtual void DrawArc (CDC* pDC);
 // Implementation
 public:
 	virtual ~CMFCApplicationView();

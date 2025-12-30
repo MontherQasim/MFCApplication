@@ -1,4 +1,4 @@
-
+﻿
 // MFCApplicationView.cpp : implementation of the CMFCApplicationView class
 //
 
@@ -59,9 +59,6 @@ void CMFCApplicationView::OnDraw(CDC* pDC)
 	ASSERT_VALID(pDoc);
 	if (!pDoc)
 		return;
-
-	// TODO: add draw code for native data here
-	DrawRectangle (pDC);
 }
 
 void CMFCApplicationView::DrawRectangle (CDC* pDC)
@@ -83,6 +80,68 @@ void CMFCApplicationView::DrawRectangle (CDC* pDC)
 
 	pDC->SelectObject (pOldBrush);  
 }
+
+void CMFCApplicationView::DrawEllipse (CDC* pDC) 
+{
+	CPalette pal;
+	pal.CreateHalftonePalette (pDC);
+
+	/*
+	 palette.Attach(::CreateHalftonePalette(NULL));
+	*/
+
+	CPalette* pOld = pDC->SelectPalette (&pal, FALSE);
+	pDC->RealizePalette ();
+
+	CBrush br1 (RGB (255, 0, 0));  
+	CBrush br2 (RGB (0, 0, 255)); 
+
+	pDC->SelectObject (&br1);
+	pDC->Ellipse (10, 10, 120, 100);
+
+	pDC->SelectObject (&br2);
+	pDC->Ellipse (140, 10, 250, 100);
+
+	if (pOld)
+		pDC->SelectPalette (pOld, FALSE);
+}
+
+void CMFCApplicationView::DrawPie (CDC* pDC)
+{
+	const int NUM_COLORS = 32;
+
+	struct
+	{
+		WORD         palVersion;
+		WORD         palNumEntries;
+		PALETTEENTRY palPalEntry[NUM_COLORS];
+	} pal;
+
+	pal.palVersion = 0x300;
+	pal.palNumEntries = NUM_COLORS;
+
+	for (int i = 0; i < NUM_COLORS; ++i)
+	{
+		BYTE v = (BYTE)(i * 8);
+		pal.palPalEntry[i].peRed = v;
+		pal.palPalEntry[i].peGreen = 0;  
+		pal.palPalEntry[i].peBlue = 0; 
+		pal.palPalEntry[i].peFlags = 0;	 //   PC_EXPLICIT ,PC_NOCOLLAPSE, PC_RESERVED
+	}
+	CPalette palette;
+	palette.CreatePalette ((LOGPALETTE*)&pal);
+	CPalette* pOld = pDC->SelectPalette (&palette, FALSE);
+	// The palette manager maps (dithers) the logical palette to the system palette
+	pDC->RealizePalette ();
+	CBrush brush (RGB (255, 0, 0));
+	CBrush* pOldBrush = pDC->SelectObject (&brush);
+	pDC->Pie (10, 10, 200, 200, 10, 100, 100, 10);
+	pDC->SelectObject (pOldBrush);
+	if (pOld)
+		pDC->SelectPalette (pOld, FALSE);
+}
+
+
 
 
 // CMFCApplicationView printing
