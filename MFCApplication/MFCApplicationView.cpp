@@ -32,6 +32,12 @@ BEGIN_MESSAGE_MAP(CMFCApplicationView, CView)
 	ON_WM_RBUTTONUP()
 	ON_WM_DESTROY ()
  //   ON_WM_TIMER ()
+	ON_WM_CREATE ()
+	//ON_WM_SIZE ()
+	ON_WM_TIMER ()
+	ON_WM_DESTROY ()
+	ON_COMMAND (ID_DEMO_PROGRESS, &CMFCApplicationView::OnDemoProgress)
+	ON_UPDATE_COMMAND_UI (ID_DEMO_PROGRESS, &CMFCApplicationView::OnUpdateDemoProgress)
 END_MESSAGE_MAP()
 
 // CMFCApplicationView construction/destruction
@@ -40,11 +46,21 @@ CMFCApplicationView::CMFCApplicationView() noexcept
 {
 	// TODO: add construction code here
 	m_counter = 0;
+	m_bProgressCreated = FALSE;
+	m_nProgressPos = 0;
 }
 
 CMFCApplicationView::~CMFCApplicationView()
 {
 	//KillTimer (1);	  // or inside OnDestroy
+}
+
+int CMFCApplicationView::OnCreate (LPCREATESTRUCT lpCreateStruct) {
+	if (CView::OnCreate (lpCreateStruct) == -1)
+		return -1;
+	CRect rectProgress (50, 50, 700, 100); if (m_wndProgress.Create (WS_CHILD | WS_VISIBLE | WS_BORDER | PBS_SMOOTH, rectProgress, this, IDC_PROGRESS)) {
+		m_bProgressCreated = TRUE; m_wndProgress.SetRange (0, 100); m_wndProgress.SetPos (50); m_wndProgress.SetStep (1); m_nProgressPos = 0;
+	} return 0;
 }
 void CMFCApplicationView::OnInitialUpdate ()
 {
@@ -220,13 +236,6 @@ VOID CALLBACK CMFCApplicationView::MyTimerProc (
 	g_pView->Invalidate (FALSE);    
 }
 
-void CMFCApplicationView::OnDestroy ()
-{
-	// Stopping a Timer
-	KillTimer (1);
-	CView::OnDestroy ();
-}
-
 // CMFCApplicationView printing
 
 
@@ -265,6 +274,61 @@ void CMFCApplicationView::OnContextMenu(CWnd* /* pWnd */, CPoint point)
 	theApp.GetContextMenuManager()->ShowPopupMenu(IDR_POPUP_EDIT, point.x, point.y, this, TRUE);
 #endif
 }
+
+void CMFCApplicationView::OnUpdateDemoProgress (CCmdUI* pCmdUI)
+{
+	pCmdUI->Enable (m_bProgressCreated);
+}
+void CMFCApplicationView::OnDemoProgress ()
+{
+	if (!m_bProgressCreated || !m_wndProgress.GetSafeHwnd ())
+		return;
+
+	SetTimer (IDT_PROGRESS_TIMER, 100, NULL);
+
+	AfxMessageBox (_T ("Progress demo started!\nWatch the progress bar fill automatically."),
+		MB_OK | MB_ICONINFORMATION);
+}
+
+void CMFCApplicationView::OnTimer (UINT_PTR nIDEvent)
+{
+	if (nIDEvent == IDT_PROGRESS_TIMER)
+	{
+		m_nProgressPos++;
+
+		if (m_nProgressPos <= 100)
+		{
+			m_wndProgress.SetPos (m_nProgressPos);
+		}
+		else
+		{
+			KillTimer (IDT_PROGRESS_TIMER);
+
+			m_nProgressPos = 0;
+
+			AfxMessageBox (_T ("Progress completed!\nYou can run the demo again from the context menu."),
+				MB_OK | MB_ICONINFORMATION);
+		}
+	}
+
+	CView::OnTimer (nIDEvent);
+}
+void CMFCApplicationView::OnDestroy ()
+{
+	KillTimer (1);
+
+	KillTimer (IDT_PROGRESS_TIMER);
+
+	if (m_wndProgress.GetSafeHwnd ())
+	{
+		m_wndProgress.DestroyWindow ();
+	}
+
+	m_bProgressCreated = FALSE;
+
+	CView::OnDestroy ();
+}
+
 
 
 // CMFCApplicationView diagnostics

@@ -88,6 +88,9 @@
 #define ID_TEST_UITHREAD            308
 #define ID_THREAD_SUSPENDTHREAD     309
 #define ID_THREAD_RESUMETHREAD      310
+#define IDT_PROGRESS_TIMER          311
+#define ID_DEMO_PROGRESS            312
+#define IDC_PROGRESS                 313
 
 // Next default values for new objects
 //
